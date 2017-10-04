@@ -18,7 +18,7 @@ int lightPin = 0;  //define a pin for Photo resistor
 
 void setup()
 {
-    Serial.begin(1200);  //Begin serial communcation
+    Serial.begin(600);  //Begin serial communcation
 }
 
 int lastRead = 0;
