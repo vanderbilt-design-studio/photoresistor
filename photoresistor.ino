@@ -16,21 +16,17 @@ values gives higher readings) from pin 0 to GND. (see appendix of arduino notebo
 
 void setup()
 {
-    Serial.begin(600);  //Begin serial communcation
+    Serial.begin(9600);  //Begin serial communcation
 }
 
-bool isOpen = false;
+int lastRead;
 void loop()
 {
   if (Serial.available() > 0) {
     while (Serial.available() > 0) Serial.read();
-    Serial.write(isOpen ? (byte) 1 : (byte) 0);
+    Serial.print(lastRead, DEC);
     Serial.flush();
   }
-   if (analogRead(0) > 200 ) {
-    isOpen = true;
-   } else {
-    isOpen = false;
-   }
+   lastRead = analogRead(0);
    delay(10); //short delay for faster response to light.
 }
