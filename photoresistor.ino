@@ -24,7 +24,8 @@ void loop()
 {
   if (Serial.available() > 0) {
     while (Serial.available() > 0) Serial.read();
-    Serial.print(lastRead, DEC);
+    Serial.write(lastRead / 256);
+    Serial.write(lastRead % 256);
     Serial.flush();
   }
    lastRead = analogRead(0);
