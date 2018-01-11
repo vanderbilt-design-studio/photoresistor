@@ -47,7 +47,7 @@ class doorSensor : photo {
       lastVal = photoRead();
     }
     bool ajar() {
-      return lastVal > 200;
+      return lastVal > 110;
     }
 };
 
