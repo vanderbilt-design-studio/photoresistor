@@ -53,7 +53,7 @@ class doorSensor : photo {
       lastVal = photoRead();
     }
     bool ajar() {
-      return lastVal > 110;
+      return lastVal > 100;
     }
 };
 
@@ -112,13 +112,13 @@ void loop()
 }
 
 
-#define ARDUINO_UID 32
+#define ARDUINO_UID 16
 
 int handleRequest(byte req) {
-#define IDENT_REQ 0
-#define DOOR_SENSOR_REQ 2
-#define MOTION_SENSOR_REQ 4
-#define RELAY_CHANGE 8
+#define DOOR_SENSOR_REQ 4
+#define MOTION_SENSOR_REQ 8
+#define RELAY_CHANGE 16
+#define IDENT_REQ 32
   switch (req) {
     case IDENT_REQ:
       Serial.write(ARDUINO_UID);
