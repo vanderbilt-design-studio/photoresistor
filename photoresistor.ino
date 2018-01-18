@@ -13,11 +13,17 @@
 
   ----------------------------------------------------
 */
-
+// Need two because Arduino doesn't have enough power to drive the relay with 1 pin.
+#define RELAY_PIN1 5
+#define RELAY_PIN2 6
+#define RELAY_PIN3 7
 void setup()
 {
   // Serial @ 9600 BAUD. If you change this, make sure you change it in the studio status program.
   Serial.begin(9600);
+  pinMode(RELAY_PIN1, OUTPUT);
+  pinMode(RELAY_PIN2, OUTPUT);
+  pinMode(RELAY_PIN3, OUTPUT);
 }
 
 class photo {
@@ -106,10 +112,17 @@ void loop()
 }
 
 
+#define ARDUINO_UID 32
+
 int handleRequest(byte req) {
+#define IDENT_REQ 0
 #define DOOR_SENSOR_REQ 2
 #define MOTION_SENSOR_REQ 4
+#define RELAY_CHANGE 8
   switch (req) {
+    case IDENT_REQ:
+      Serial.write(ARDUINO_UID);
+      break;
     case DOOR_SENSOR_REQ:
       // Send the value as unsigned byte. Studio status program reassembles them on the other end.
       // (I tried other ways of sending the data but it gets very garbled very quickly. Simply using
@@ -118,6 +131,13 @@ int handleRequest(byte req) {
       break;
     case MOTION_SENSOR_REQ:
       motion.detected() ? Serial.write(2) : Serial.write(0);
+      break;
+    case RELAY_CHANGE:
+      if (Serial.read() == 2) {
+        digitalWrite(RELAY_PIN1, HIGH); digitalWrite(RELAY_PIN2, HIGH); digitalWrite(RELAY_PIN3, HIGH);
+      } else {
+        digitalWrite(RELAY_PIN1, LOW); digitalWrite(RELAY_PIN2, LOW); digitalWrite(RELAY_PIN3, LOW);
+      }
       break;
     default:
       // Do nothing. I would like to have better error handling, but can't think of anything at the moment.
