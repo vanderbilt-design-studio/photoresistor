@@ -112,7 +112,7 @@ void loop()
 }
 
 
-#define ARDUINO_UID 16
+#define ARDUINO_UID 32
 
 int handleRequest(byte req) {
 #define DOOR_SENSOR_REQ 4
@@ -133,10 +133,15 @@ int handleRequest(byte req) {
       motion.detected() ? Serial.write(2) : Serial.write(0);
       break;
     case RELAY_CHANGE:
-      if (Serial.read() == 2) {
-        digitalWrite(RELAY_PIN1, HIGH); digitalWrite(RELAY_PIN2, HIGH); digitalWrite(RELAY_PIN3, HIGH);
-      } else {
-        digitalWrite(RELAY_PIN1, LOW); digitalWrite(RELAY_PIN2, LOW); digitalWrite(RELAY_PIN3, LOW);
+      switch (Serial.read()) {
+        case 2:
+          digitalWrite(RELAY_PIN1, HIGH); digitalWrite(RELAY_PIN2, HIGH); digitalWrite(RELAY_PIN3, HIGH);
+          break;
+        case 0:
+          digitalWrite(RELAY_PIN1, LOW); digitalWrite(RELAY_PIN2, LOW); digitalWrite(RELAY_PIN3, LOW);
+          break;
+        default:
+          break;
       }
       break;
     default:
