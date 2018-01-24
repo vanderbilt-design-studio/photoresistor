@@ -45,12 +45,15 @@ class photo {
 };
 
 class doorSensor : photo {
+// The door sensor shouldn't be considered very dependent because a period of time
+// is required before it's value can be considered actually valid
+#define DOOR_ALPHA 0.3
   private:
     int lastVal;
   public:
     doorSensor(int port) : photo(port) {}
     void observe() {
-      lastVal = photoRead();
+      lastVal = photoRead() * DOOR_ALPHA + lastVal * (1 - DOOR_ALPHA);
     }
     bool ajar() {
       return lastVal > 100;
@@ -59,29 +62,28 @@ class doorSensor : photo {
 
 class motionSensor : photo {
 #define MOTION_ALPHA 0.7 // How much previous measurements should be taken into account
-#define MOTION_DETECT 0.3 // How much disturbance should be considered movement
-#define MOTION_RECENT_TIMEFRAME 300000 // 5 mins
+#define MOTION_DETECT 0.2 // How much disturbance should be considered movement
+#define MOTION_RECENT_TIMEFRAME 60000 // 1 minute
   private:
-    float runningVal;
-    unsigned long lastDetected;
+    float runningVal = 0.;
+    unsigned long lastDetected = 0;
     bool recentlyDetected = false;
   public:
     motionSensor(int port) : photo(port) {}
     void observe() {
       int nextVal = photoRead();
-      runningVal = MOTION_ALPHA * nextVal + (1 - MOTION_ALPHA) * runningVal;
-
+      
       // We only want to track positive values of this, because this means
       // there was a sudden decrease in light. Sudden increase might mean
       // that the lights were turned on or someone was putting their hand
       // in front of the sensor for an extended period of time.
-      bool detected = ((runningVal - nextVal) / runningVal) > MOTION_DETECT;
-      if (detected) {
-        if (!recentlyDetected) {
-          recentlyDetected = true;
-        }
+      bool iSeeSomething = ((runningVal - nextVal) / runningVal) > MOTION_DETECT;
+      if (iSeeSomething) {
+        recentlyDetected = true;
         lastDetected = millis();
       }
+
+      runningVal = MOTION_ALPHA * nextVal + (1 - MOTION_ALPHA) * runningVal;
     }
     bool detected() {
       if (millis() - lastDetected > MOTION_RECENT_TIMEFRAME) {
